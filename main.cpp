@@ -1,38 +1,36 @@
+// UVa11988 Broken Keyboard
+// Rujia Liu
+#include<cstdio>
+#include<cstring>
+const int maxn = 100000 + 5;
+int last, cur, next[maxn]; // 光标位于cur号字符之后面//  next数组来实现的链表.
+char s[maxn];
 
-//https://www.nowcoder.com/ta/acm-solutions/review?tpId=20&tqId=11221&query=&asc=true&order=&page=1    跳远题目:
+int main() {
+    while(scanf("%s", s+1) == 1) {//存入数组中. 地址便宜一个.// 读入一个数据就存下来, 一个数据不超过100000+5个字符.
+        // 表示每次处理一个字符串, 空格作为结束符.
 
-#include <cstdio>
-#include <cmath>
-const double eps=1e-9;
-double h1,h2,d1,d2,a,b;
-bool check(double x0){
-    double y;
-    if(x0<d1){
-        double y0=h1-a*x0*x0;
-        y=y0-b*(d1-x0)*(d1-x0);
-    }
-    else if(x0-eps>d2) return false;
-    else y=h1-a*d1*d1;
-    return y+eps>=h2;
-}
-int main(){
-    while(scanf("%lf %lf %lf %lf %lf %lf",&h1,&h2,&d1,&d2,&a,&b)==6){// 一直读取6个.直到
+        int n = strlen(s+1); // 输入保存在s[1], s[2]...中
+        last = cur = 0;
+        next[0] = 0;
 
-        //
-
-        double A=a+b;
-        double B=-2.*b*d2;
-        double C=b*d2*d2-h1;
-        double det=B*B-4*A*C;
-        bool ans=false;
-        if(det+eps>=0){
-            det=sqrt(fabs(det));
-            double x1=(-B-det)/(2*A);
-            double x2=(-B+det)/(2*A);
-            if(x1+eps>=0.) ans=ans||check(x1);
-            if(x2+eps>=0.) ans=ans||check(x2);
+        for(int i = 1; i <= n; i++) {
+            char ch = s[i];
+            if(ch == '[') cur = 0;
+            else if(ch == ']') cur = last;
+            else {
+                next[i] = next[cur];
+                next[cur] = i;
+                if(cur == last) last = i; // 更新“最后一个字符”编号
+                cur = i; // 移动光标
+            }
         }
-        puts(ans?"Yes":"No");
+
+
+        for(int i = next[0]; i != 0; i = next[i])
+            printf("%c", s[i]);
+
+        printf("\n");
     }
     return 0;
 }
