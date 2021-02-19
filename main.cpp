@@ -1,36 +1,58 @@
-// UVa11988 Broken Keyboard
+// UVa548 Tree
 // Rujia Liu
-#include<cstdio>
-#include<cstring>
-const int maxn = 100000 + 5;
-int last, cur, next[maxn]; // 光标位于cur号字符之后面//  next数组来实现的链表.// 实际上是用next数组来 存光标跳转.
-char s[maxn];
+// 题意：给一棵点带权（权各不相同，都是正整数）二叉树的中序和后序遍历，找一个叶子使得它到根的路径上的权和最小。如果有多解，该叶子本身的权应尽量小
+// 算法：递归建树，然后DFS。注意，直接递归求结果也可以，但是先建树的方法不仅直观，而且更好调试
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<algorithm>
+using namespace std;
+
+// 因为各个结点的权值各不相同且都是正整数，直接用权值作为结点编号
+const int maxv = 10000 + 10;
+int in_order[maxv], post_order[maxv], lch[maxv], rch[maxv];
+int n;
+
+bool read_list(int* a) { // 传入的是int数组.
+    string line;
+    if(!getline(cin, line)) return false;  //从标准输入读取一行到line这个变量.
+    stringstream ss(line);// 变成stringstream
+    n = 0;
+    int x;
+    while(ss >> x) a[n++] = x;// n表示节点的数量.
+    return n > 0;
+}
+
+// 把in_order[L1..R1]和post_order[L2..R2]建成一棵二叉树，返回树根
+int build(int L1, int R1, int L2, int R2) {
+    if(L1 > R1) return 0; // 空树
+    int root = post_order[R2];
+    int p = L1;
+    while(in_order[p] != root) p++;
+    int cnt = p-L1; // 左子树的结点个数  , p位置是root,
+    lch[root] = build(L1, p-1, L2, L2+cnt-1);
+    rch[root] = build(p+1, R1, L2+cnt, R2-1);
+    return root;
+}
+
+int best, best_sum; // 目前为止的最优解和对应的权和, best用来存解的叶子值.
+
+void dfs(int u, int sum) { // u是根节点的val
+    sum += u;
+    if(!lch[u] && !rch[u]) { // 叶子
+        if(sum < best_sum || (sum == best_sum && u < best)) { best = u; best_sum = sum; }
+    }
+    if(lch[u]) dfs(lch[u], sum);//如果有做节点, 那么我们就递归跑子问题.
+    if(rch[u]) dfs(rch[u], sum);
+}
 
 int main() {
-    while(scanf("%s", s+1) == 1) {//存入数组中. 地址便宜一个.// 读入一个数据就存下来, 一个数据不超过100000+5个字符.
-        // 表示每次处理一个字符串, 空格作为结束符.   \000  在Windows系统中，正斜杠/表示除法， 除法是正统的运算, 用正斜杠表示--------用来进行整除运算；反斜杠\用来表示目录 反斜杠,反过来,所以是左撇子从左开始写.
-
-        int n = strlen(s+1); // 输入保存在s[1], s[2]...中
-        last = cur = 0;
-        next[0] = 0;
-
-        for(int i = 1; i <= n; i++) {
-            char ch = s[i];
-            if(ch == '[') cur = 0;  //cur表示走完当前字符后, 光标所在的位置.
-            else if(ch == ']') cur = last; // cur表示下个节点插入的位置.
-            else {
-                next[i] = next[cur];  //遇到其他字符就正常跳转.----------这段逻辑等价于链表中的添加节点的操作. 这一行等价于 在 i-1节点和 i节点之间加入current. 也就是把i节点加入 i-1和current之间!!!!!!!!!!!!!!!!.    所以这个步奏是 把i的next指针指向cur
-                next[cur] = i;            // 表示current结点跳跃后的索引是i.
-                if(cur == last) last = i; // 更新“最后一个字符”编号,  用于更新上吗的else if 判断.
-                cur = i; // 移动光标   //current走到i结点. 做下次链接.
-            }
-        }
-
-
-        for(int i = next[0]; i != 0; i = next[i])// next找到下一个索引 ,  0是头结点.
-            printf("%c", s[i]);
-
-        printf("\n");
+    while(read_list(in_order)) {
+        read_list(post_order);//读入2个顺序表.
+        build(0, n-1, 0, n-1);
+        best_sum = 1000000000;
+        dfs(post_order[n-1], 0);
+        cout << best << "\n";
     }
     return 0;
 }

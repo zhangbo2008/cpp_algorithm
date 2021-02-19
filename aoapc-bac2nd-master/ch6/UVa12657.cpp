@@ -70,8 +70,9 @@ int main() {
     for(int i = 1; i <= n; i++) {
       b = right[b];
       if(i % 2 == 1) ans += b;
-    }
-    if(inv && n % 2 == 0) ans = (long long)n*(n+1)/2 - ans;
+    }//奇数的都加上.
+
+    if(inv && n % 2 == 0) ans = (long long)n*(n+1)/2 - ans;// 如果做了inv总共偶数个,那么就是全部其他值.
     printf("Case %d: %lld\n", ++kase, ans);
 
 

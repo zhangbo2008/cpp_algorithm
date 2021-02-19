@@ -9,11 +9,11 @@ using namespace std;
 bool solve(int& W) {
   int W1, D1, W2, D2;
   bool b1 = true, b2 = true;
-  cin >> W1 >> D1 >> W2 >> D2;
-  if(!W1) b1 = solve(W1);
+  cin >> W1 >> D1 >> W2 >> D2;  //读取4个数据
+  if(!W1) b1 = solve(W1);  //  注意是传引用. 这个很精妙. 穿进去w1, 传出来的w1, 就表示这个天平本身的重量了!!!!!!!!
   if(!W2) b2 = solve(W2);
-  W = W1 + W2;
-  return b1 && b2 && (W1 * D1 == W2 * D2);
+  W = W1 + W2;            // 使用这个来维护天平本身的重量. 天平本身重量等价于他左右放的重量的和.
+  return b1 && b2 && (W1 * D1 == W2 * D2);   // 判断左是否平衡, 右是否平衡. 并且本身也平衡.
 }
 
 int main() {
